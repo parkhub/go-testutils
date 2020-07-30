@@ -12,8 +12,6 @@ type Query interface {
 
 	DB(db DB) Query
 
-	Model(model ...interface{}) Query
-
 	// TableModel() orm.TableModel
 
 	// Deleted adds `WHERE deleted_at IS NOT NULL` clause for soft deleted models.

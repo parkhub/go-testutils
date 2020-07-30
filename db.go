@@ -21,6 +21,8 @@ type BaseDB interface {
 // DB interface includes the pg.DB methods used in transactions API
 type DB interface {
 	BaseDB
+
+	Model(model ...interface{}) Query
 }
 
 // Tx interface includes the pg.Tx methods used in transactions API

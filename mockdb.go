@@ -127,10 +127,15 @@ func (db *MockDB) Delete(model interface{}) error {
 		model.(Model).GetID())
 }
 
-func (db *MockDB) Model(model interface{}) *MockQuery {
+func (db *mockdb) Model(model ...interface{}) query {
+	numModels := len(model)
+	queryModels := make([]Model, numModels, numModels)
+	for i, m := range model {
+		queryModels[i] = m.(Model)
+	}
 	return &MockQuery{
-		db: db,
-		queryModels: []Model{ model.(Model) },
+		db:          db,
+		queryModels: queryModels,
 	}
 }
 

@@ -27,13 +27,6 @@ func (q *MockQuery) DB(db DB) Query {
 	return q
 }
 
-func (q *MockQuery) Model(model ...interface{}) Query {
-	for _, m := range model {
-		q.queryModels = append(q.queryModels, m.(Model))
-	}
-	return q
-}
-
 // Deleted adds `WHERE deleted_at IS NOT NULL` clause for soft deleted models.
 func (q *MockQuery) Deleted() Query {
 	return q

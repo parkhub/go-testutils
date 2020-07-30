@@ -114,6 +114,18 @@ func (tx *MockTx) Close() error {
 	return nil
 }
 
+func (tx *MockTx) Model(model ...interface{}) Query {
+	numModels := len(model)
+	queryModels := make([]Model, numModels, numModels)
+	for i, m := range model {
+		queryModels[i] = m.(Model)
+	}
+	return &MockQuery{
+		db: tx.db,
+		queryModels: queryModels,
+	}
+}
+
 // MarshalModels returns a pretty string of JSON for logging out the contents of
 // the MockTx models
 func (tx *MockTx) MarshalModels() (string, error) {
