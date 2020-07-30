@@ -20,22 +20,12 @@ func NewMockDB() *MockDB {
 	return &db
 }
 
+// MARK: Public Methods
+
 // Begin starts a transaction. Most callers should use RunInTransaction instead.
 func (db *MockDB) Begin() (*MockTx, error) {
 	tx := &MockTx{db: db, open: true, models: append(db.models)}
 	return tx, nil
-}
-
-// QueueResponses allows a test to add an ordered list of mock responses to the
-// database for Query, QueryOne, and Select calls
-func (db *MockDB) QueueResponses(response ...interface{}) {
-	db.responses = append(db.responses, response...)
-}
-
-// QueueResponses allows a test to add a list of mock data models to the
-// database for Update and Delete calls
-func (db *MockDB) QueueModels(model ...Model) {
-	db.models = append(db.models, model...)
 }
 
 // RunInTransaction runs a function in a transaction. If function
@@ -61,7 +51,7 @@ func (db *MockDB) RunInTransaction(fn func(tx Tx) error) error {
 // The params are for any placeholders in the query.
 func (db *MockDB) Query(model, query interface{}, params ...interface{}) (pg.Result, error) {
 	if len(db.responses) == 0 {
-		return nil, nil
+		return (pg.Result)(nil), nil
 	}
 	reflect.ValueOf(model).Elem().Set(reflect.ValueOf(db.responses[0]))
 	db.responses = db.responses[1:]
@@ -74,7 +64,7 @@ func (db *MockDB) Query(model, query interface{}, params ...interface{}) (pg.Res
 // ErrMultiRows when query returns multiple rows.
 func (db *MockDB) QueryOne(model, query interface{}, params ...interface{}) (pg.Result, error) {
 	if len(db.responses) == 0 {
-		return nil, pg.ErrNoRows
+		return (pg.Result)(nil), pg.ErrNoRows
 	}
 	reflect.ValueOf(model).Elem().Set(reflect.ValueOf(db.responses[0]))
 	db.responses = db.responses[1:]
@@ -135,6 +125,27 @@ func (db *MockDB) Delete(model interface{}) error {
 	return fmt.Errorf("%s model with ID %s not found to delete",
 		reflect.TypeOf(model).String(),
 		model.(Model).GetID())
+}
+
+func (db *MockDB) Model(model interface{}) *MockQuery {
+	return &MockQuery{
+		db: db,
+		queryModels: []Model{ model.(Model) },
+	}
+}
+
+// MARK: Test Utilities
+
+// QueueResponses allows a test to add an ordered list of mock responses to the
+// database for Query, QueryOne, and Select calls
+func (db *MockDB) QueueResponses(response ...interface{}) {
+	db.responses = append(db.responses, response...)
+}
+
+// QueueResponses allows a test to add a list of mock data models to the
+// database for Update and Delete calls
+func (db *MockDB) QueueModels(model ...Model) {
+	db.models = append(db.models, model...)
 }
 
 // Find searches through the MockDB models and returns a model of matching type

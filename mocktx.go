@@ -94,7 +94,6 @@ func (tx *MockTx) Delete(model interface{}) error {
 // Commit commits the transaction.
 func (tx *MockTx) Commit() error {
 	tx.db.models = tx.models
-	// copy(tx.db.models, tx.models)
 	tx.db.models = append(tx.models)
 	tx.models = nil
 	return nil
