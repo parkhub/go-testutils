@@ -42,4 +42,7 @@ type Tx interface {
 
 	// Delete is an alias for DB.Delete
 	Delete(model interface{}) error
+
+	// Returning is an alias for DB.Returning
+	Returning(query interface{}) (pg.Result, error)
 }
